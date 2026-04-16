@@ -4,9 +4,9 @@
 #   - Build workflow completing on DEV (push to main or manual dispatch)
 #   - Release published (PROD)
 #
-# Required repository secrets:
+# Required environment secrets (Settings > Environments > DEV / PROD):
 #   AWS_ACCESS_KEY      – IAM access key
-#   AWS_SECRET_KEY  – Corresponding secret key
+#   AWS_SECRET_KEY      – Corresponding secret key
 
 name: Deploy to S3
 
@@ -32,6 +32,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Pick the environment based on the trigger
+    environment: ${{ github.event_name == 'release' && 'PROD' || 'DEV' }}
     # Only run if: build succeeded (DEV) OR a release was published (PROD)
     if: >-
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
