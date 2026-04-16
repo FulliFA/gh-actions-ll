@@ -1,0 +1,41 @@
+# Build
+#
+# Builds the React app with Vite and uploads the artifact.
+# Triggers the Deploy workflow on completion for DEV.
+
+name: Build
+
+on:
+  # Trigger on pushes to main branch
+  push:
+    branches: [main]
+
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: build-${{ github.run_number }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-${{ github.run_number }}
+          path: dist/
